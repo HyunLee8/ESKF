@@ -76,6 +76,10 @@ ESKF::ESKF(Data& data) : dataObject(data) {
     dt = dataObject.getdt();
     Gyro = dataObject.getGyro();
     Acc = dataObject.getAcc();
+
+
+
+
     Pos = dataObject.getPos();
     Vel = dataObject.getVel();
 
@@ -294,7 +298,7 @@ void ESKF::update() {
     Eigen::Vector3d delta_ab(delta_X[9], delta_X[10], delta_X[11]);
     Eigen::Vector3d delta_wb(delta_X[12], delta_X[13], delta_X[14]);
 
-    Eigen::Quaterniond nominalQ(X[0], X[1], X[2], X[3]);
+    Eigen::Quaterniond nominalQ(X[3], X[4], X[5], X[6]);
     double angle = delta_theta.norm();
 
     Eigen::Quaterniond delta_q;
@@ -334,4 +338,22 @@ void ESKF::update() {
     std::cout << '\n';
 
     // Make csv loading logic here soon
+
+}
+
+//this is a lazy ass fix
+void ESKF::nextSet() {
+    dataObject.itr++;
+
+    dataObject.sensorData.getSensorData(dataObject.itr);
+    dataObject.motionData.getMotionData(dataObject.itr);
+
+    dt = dataObject.getdt();
+    Gyro = dataObject.getGyro();
+    Acc = dataObject.getAcc();
+    Pos = dataObject.getPos();
+    Vel = dataObject.getVel();
+
+    Measurement << Pos, Vel;
+    U << Acc, Gyro;
 }

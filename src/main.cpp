@@ -22,9 +22,10 @@ Index:
 int main() {
     Data data(0);
     ESKF TrueFilter(data);
-    while(TrueFilter.iterration < 5000) {
+    while(TrueFilter.iterration < 100) {
         TrueFilter.predict();
         TrueFilter.update();
+        TrueFilter.nextSet();
     }
     return 0;
 }

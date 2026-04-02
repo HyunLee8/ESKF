@@ -24,8 +24,10 @@ Data::Data(int i)
     : sensorData(readCSV("../src/data/sensor_data.csv")),
       motionData(readCSV("../src/data/motion_data.csv")) {
 
-    sensorData.getSensorData(i);
-    motionData.getMotionData(i);
+    itr = i;
+
+    sensorData.getSensorData(itr);
+    motionData.getMotionData(itr);
 }
 
 double Data::getdt() {

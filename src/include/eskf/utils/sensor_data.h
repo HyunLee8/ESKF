@@ -13,12 +13,12 @@ private:
     double dt;
 
     static constexpr int DT_COL = 0;
-    static constexpr int ACC_X_COL = 1;
-    static constexpr int ACC_Y_COL = 2;
-    static constexpr int ACC_Z_COL = 3;
-    static constexpr int GYRO_X_COL = 4;
-    static constexpr int GYRO_Y_COL = 5;
-    static constexpr int GYRO_Z_COL = 6;
+    static constexpr int ACC_X_COL = 4;
+    static constexpr int ACC_Y_COL = 5;
+    static constexpr int ACC_Z_COL = 6;
+    static constexpr int GYRO_X_COL = 1;
+    static constexpr int GYRO_Y_COL = 2;
+    static constexpr int GYRO_Z_COL = 3;
 
 public:
     SensorData(const std::vector<std::vector<double>>& data);

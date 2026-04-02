@@ -11,9 +11,14 @@ private:
     std::vector<std::vector<double>> motion_data_csv;
     std::vector<std::vector<double>> readCSV(const std::string &fileName);
 
+
+public:
+
     SensorData sensorData;
     MotionData motionData;
-public:
+
+    int itr;
+
     explicit Data(int i);
     double getdt();
     Eigen::Matrix<double, 3, 1> getAcc();

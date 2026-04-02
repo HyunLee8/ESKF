@@ -63,6 +63,8 @@ public:
 
     Eigen::Matrix<double, 15, 15> computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R);
 
+    void nextSet();
+
     void predict();
 
     void update();
