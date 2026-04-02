@@ -270,11 +270,6 @@ void ESKF::update() {
 
     Eigen::MatrixXd H;
 
-    Eigen::VectorXd flatMeasurement = Eigen::Map<const Eigen::VectorXd> (
-        Measurement.data(), 
-        Measurement.rows() * Measurement.cols()
-    );
-
 
     H = Eigen::MatrixXd::Zero(6, 15);
     H.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();

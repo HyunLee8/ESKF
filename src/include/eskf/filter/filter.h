@@ -41,12 +41,12 @@ private:
 
     Eigen::Matrix<double, 6, 1> Measurement;
     Eigen::Matrix<double, 6, 6> RMeasurement;
-    Eigen::Matrix<double, 3, 2> U;
+    Eigen::Matrix<double, 6, 1> U;
     Eigen::Matrix<double, 3, 3> R;
 
     int measuredSize;
 
-    Eigen::VectorXd y;
+    Eigen::Matrix<double, 6, 1> y;
 public:
     int iterration;
 
