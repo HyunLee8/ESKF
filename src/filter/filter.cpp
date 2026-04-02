@@ -1,4 +1,4 @@
-"""
+/*
 ***Important ~~ Intuitive Explanations in lines 145 and 221.
 
     Author: Isaac Lee
@@ -36,16 +36,17 @@
         however most of this is good and does NOT need further simplification like 
         how quaternionRotation was implemented. The actual c++ library for this is less
         efficient than hard coding.
-"""
+*/
 
+#include "eskf/filter/filter.h"
 #include <eskf/data/data.h>
 #include <Eigen/Dense>
-#include <Eigen/Geomentry>
+#include <Eigen/Geometry>
 #include <vector>
 #include <string>
 #include <iostream>
 
-ESKF::ESKF(Data& data) {
+ESKF::ESKF(Data& data) : dataObject(data) {
     sig_a_noise = 0.1;
     sig_a_walk = 0.1;
     sig_w_noise = 0.1;
@@ -53,21 +54,23 @@ ESKF::ESKF(Data& data) {
 
     gravity = 9.81;
     iterration = 0;
-    dataObject = data(iterration);
+    dataObject = data;
 
     X.setZero();                            //initialize States
     X(3) = 1;                               //Scalar value is set to 1
 
     delta_X.setZero();                      //initialize Error States (this is LOWER CASE DELTA. Not change in Time))
 
-    P = EigenMatrix<double, 15, 15>::Identity();
+    P = Eigen::Matrix<double, 15, 15>::Identity();
 
-    Qi<< sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise,
+
+    Eigen::Matrix<double, 12, 1> diagVec;
+    diagVec << sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise,
          sig_w_noise*sig_w_noise, sig_w_noise*sig_w_noise, sig_w_noise*sig_w_noise,
          sig_a_walk*sig_a_walk, sig_a_walk*sig_a_walk, sig_a_walk*sig_a_walk,
          sig_w_walk*sig_w_walk, sig_w_walk*sig_w_walk, sig_w_walk*sig_w_walk;
 
-    Eigen::Matrix<double, 12, 12> Qi = diagVec.asDiagonal();
+    this->Qi = diagVec.asDiagonal();
     Gravity << 0, 0, gravity;
 
     dt = dataObject.getdt();
@@ -76,12 +79,12 @@ ESKF::ESKF(Data& data) {
     Pos = dataObject.getPos();
     Vel = dataObject.getVel();
 
-    Measurement.col(0) = Pos;
-    Measurement.col(1) = Vel;
-    RMeasurment = nullptr;
+    Measurement << Pos, Vel;
+    RMeasurement = Eigen::Matrix<double, 6, 6>::Identity();
 
-    U.col(0) = Acc;
-    U.col(1) = Gyro;
+    measuredSize = 6;
+
+    U << Acc, Gyro;
 }
 
 Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) {
@@ -97,13 +100,13 @@ Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) 
     return mat;
 }
 
-Eigen::Matrix<double, 4, 3> ESKF::skewSymmestric(Eigen::Matrix<double, 4, 1>& v) {
+Eigen::Matrix<double, 4, 3> ESKF::quaternionSkewSymmetric(Eigen::Matrix<double, 4, 1>& v) {
     double qw = v(0);
     double qx = v(1);
     double qy = v(2);
     double qz = v(3);
 
-    EigenMatrix<double, 4, 3> mat;
+    Eigen::Matrix<double, 4, 3> mat;
     mat << -qx,  -qy,  -qz,
             qw,  -qz,   qy,
             qz,   qw,  -qx,
@@ -111,16 +114,16 @@ Eigen::Matrix<double, 4, 3> ESKF::skewSymmestric(Eigen::Matrix<double, 4, 1>& v)
     return mat;
 }
 
-void ESKF::quaternionRotation(Eigen::Matrix<double, 4, 1>& three_dim_theta) {
+Eigen::Quaterniond ESKF::quaternionRotation(Eigen::Vector3d& three_dim_theta) {
     Eigen::Vector3d theta = three_dim_theta.tail<3>();
     double angle = theta.norm();
     if(angle > 0) {
         Eigen::Vector3d axis = theta / angle;
         Eigen::Quaterniond q(Eigen::AngleAxisd(angle, axis));       //Eigen has built in AngleAxisd to Quaternion conversion
-        return q.toRotationMatrix();
+        return q;
     }
     else {
-        return Eigen::Matrix3d::Identity();
+        return Eigen::Quaterniond::Identity();
     }
 }
 
@@ -135,7 +138,7 @@ Eigen::Matrix<double, 15, 15> ESKF::computeErrorStateJacobian(double& dt, Eigen:
     return Fx;
 }
 
-Eigen::Matrix<double, 15, 15> ESKF::computeNoiseJacobian(double dt, const EigenMatrix3d& R) {
+Eigen::Matrix<double, 15, 12> ESKF::computeNoiseJacobian(double dt, const Eigen::Matrix3d& R) {
     Eigen::Matrix<double, 15, 12> Fi;
     Fi.setZero();
     Fi.block<3, 3>(6, 0) = -R * dt;
@@ -147,7 +150,7 @@ Eigen::Matrix<double, 15, 15> ESKF::computeNoiseJacobian(double dt, const EigenM
 }
 
 void ESKF::predict() {
-"""
+/*
     Summary of how the prediction step works --
         Phase 1 in prediction step ~~ variable prediction:
 
@@ -178,15 +181,15 @@ void ESKF::predict() {
         P: error covariance matrix
         U: [ax ay az wx wy wz]  IMU body input vector
         dt: time step
-"""
+*/
     Eigen::Vector3d p(X[0], X[1], X[2]);
     Eigen::Quaterniond q(X[3], X[4], X[5], X[6]); // w, x, y, z
     Eigen::Vector3d v(X[7], X[8], X[9]);
     Eigen::Vector3d ab(X[10], X[11], X[12]);
     Eigen::Vector3d wb(X[13], X[14], X[15]);
 
-    Eigen::Vector3d am(U[0], U[1], U[2]);
-    Eigen::Vector3d wm(U[3], U[4], U[5]);
+    Eigen::Vector3d am(U(0), U(1), U(2));
+    Eigen::Vector3d wm(U(3), U(4), U(5));
 
     Eigen::Matrix3d R = q.toRotationMatrix();
     this->R = R;
@@ -195,35 +198,37 @@ void ESKF::predict() {
     Eigen::Vector3d gyroUnbiased = wm - wb;
 
     Eigen::Vector3d accGlobal = this->R * accUnbiased - Gravity;
-    Eigen::Vector3d pNext = this->p + this->v(this->dt) + 0.5*accGlobal*(this->dt*this->dt);
-    Eigen::Vector3d vNext = this->v + accGloval * this->dt;
+    Eigen::Vector3d pNext = p + v * this->dt + 0.5 * accGlobal*(this->dt*this->dt);
+    Eigen::Vector3d vNext = v + accGlobal * this->dt;
 
     Eigen::Vector3d theta = gyroUnbiased * this->dt;
-    Eigen::Vector4d delta_q = quaternionRotation(theta);
-    Eigen::Vector4d qNext = (q*delta_q).normalised;
+    Eigen::Quaterniond delta_q = quaternionRotation(theta);
+    Eigen::Quaterniond qNext = (q*delta_q).normalized();
 
     X[0] = pNext[0];
     X[1] = pNext[1];
     X[2] = pNext[2];
-    X[3] = qNext[0];
-    X[4] = qNext[1];
-    X[5] = qNext[2];
-    X[6] = qNext[3];
+    X[3] = qNext.w();
+    X[4] = qNext.x();
+    X[5] = qNext.y();
+    X[6] = qNext.z();
     X[7] = vNext[0];
     X[8] = vNext[1];
     X[9] = vNext[2];
 
+    //15x15
     Fx = computeErrorStateJacobian(dt, accUnbiased, gyroUnbiased, this->R);
+    //15x12
     Fi = computeNoiseJacobian(dt, this->R);
 
     P = Fx * P * Fx.transpose() + Fi * Qi * Fi.transpose();
 
-    delta_q.setZero();
+    delta_q = Eigen::Quaterniond::Identity();
     iterration++;
 }
 
-void update() {
-"""
+void ESKF::update() {
+/*
     Summary of how Update step works --
         Phase 1 in Update Step ~~ Sensor fusion:
 
@@ -256,7 +261,7 @@ void update() {
            quaternion errors. Because you use
            gyro values to calculate the 
            errors you get euler.
-"""
+*/
     Eigen::Vector3d p(X[0], X[1], X[2]);
     Eigen::Quaterniond q(X[3], X[4], X[5], X[6]); // w, x, y, z
     Eigen::Vector3d v(X[7], X[8], X[9]);
@@ -270,34 +275,18 @@ void update() {
         Measurement.rows() * Measurement.cols()
     );
 
-    int measuredSize = 6 //IMPORTANT: if you ONLY have position you MUST change this to 3
 
-    if(RMeasurement == null) {
-        R_measurement = Eigen::MatrixXd::Identity(measuredSize, measuredSize) * 0.1;
-    }
+    H = Eigen::MatrixXd::Zero(6, 15);
+    H.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();
+    H.block<3, 3>(3, 6) = Eigen::Matrix3d::Identity();
+    Eigen::Matrix<double, 6, 1> predicted; // IMPORNTANT: same issue as line 235
+    predicted << p,
+                 v;
+    y = Measurement - predicted; //FIX THIS LATER.
 
-    if(measuredSize == 3) {
-        H = Eigen::MatrixXd::Zero(3, 15);
-        H.block<3, 3>(0, 0) = Eigne::Matrix3d::Identity();
-        y = Eigen::MatrixXd(3, 1);
-        Eigen::Map<Eigen::Matrix<double, 3, 1>
-        y = Measurement - p; // IMPORNTANT: I don't think i have to reshape here but I will see during compile
 
-    } else if(measuredSize == 6) {
-        H = Eigen::MatrixXd::Zero(6, 15);
-        H.block<3, 3>(0, 0) = Eigne::Matrix3d::Identity();
-        H.block<3, 3>(3, 6) = Eigne::Matrix3d::Identity();
-        Eigen::Matrix<double, 6, 1> predicted; // IMPORNTANT: same issue as line 235
-        predicted << p,
-                     v;
-        y = Measurement - predicted; //FIX THIS LATER.
-    } else {
-        std::cout << "Measured Size is not applicable" << '\n';
-        break;
-    }
-
-    Eigen::Matrix<double, measuredSize, measuredSize> S = H * P * H.transpose() + RMeasurement;
-    Eigen::Matrix<double, 15, measuredSize> K = P * H.transpose() * S.ldlt().solve(Eigen::Matrix3d::Identity());
+    Eigen::Matrix<double, 6, 6> S = H * P * H.transpose() + RMeasurement;
+    Eigen::Matrix<double, 15, 6> K = P * H.transpose() * S.ldlt().solve(Eigen::Matrix<double, 6, 6>::Identity());
 
     delta_X = (K * y);
 
@@ -313,7 +302,9 @@ void update() {
     Eigen::Quaterniond nominalQ(X[0], X[1], X[2], X[3]);
     double angle = delta_theta.norm();
 
-    if angle < 1e-8 {
+    Eigen::Quaterniond delta_q;
+
+    if (angle < 1e-8) {
         delta_q = Eigen::Quaterniond(1, 0.5*delta_theta[0], 0.5*delta_theta[1], 0.5*delta_theta[2]);
     } else {
         Eigen::Vector3d axis = delta_theta / angle;
@@ -339,6 +330,13 @@ void update() {
     X[14] += delta_wb[1];
     X[15] += delta_wb[2];
     delta_X.setZero();
+
+    std::cout << iterration << "   ";
+    std::cout << "q1: " << X[3];
+    std::cout << " | q2: " << X[4];
+    std::cout << " | q3: " << X[5];
+    std::cout << " | q4: " << X[6];
+    std::cout << '\n';
 
     // Make csv loading logic here soon
 }

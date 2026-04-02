@@ -1,4 +1,4 @@
-"""
+/*
 Author: Isaac Lee
 Date: Jan 10, 2026
 Description:
@@ -12,7 +12,7 @@ Description:
     values and return. Data takes a requred
     arg 'i' in order to iterrate through
     the data frame.
-"""
+*/
 
 #include "eskf/data/data.h"
 #include "eskf/utils/motion_data.h"
@@ -20,13 +20,11 @@ Description:
 #include <fstream>
 #include <sstream>
 
-Data::Data(int i) {
-    sensor_data_csv = readCSV('sensor_data.csv');
-    motion_data_csv = readCSV('motion_data.csv');
+Data::Data(int i)
+    : sensorData(readCSV("../src/data/sensor_data.csv")),
+      motionData(readCSV("../src/data/motion_data.csv")) {
 
-    SensorData sensorData(sensor_data_csv);
     sensorData.getSensorData(i);
-    motionData motionData(sensor_data_csv);
     motionData.getMotionData(i);
 }
 
@@ -46,22 +44,23 @@ Eigen::Matrix<double, 3, 1> Data::getPos() {
     return motionData.getPos();
 }
 
-Eigen::Matrix<double, 3m 1> Data::getVel() {
+Eigen::Matrix<double, 3, 1> Data::getVel() {
     return motionData.getVel();
 }
 
-std::vector<std::vector<std::string>> readCSV(const std::strings &fileName) {
-    std::vector<std::vector<std::double>> data;
+std::vector<std::vector<double>> Data::readCSV(const std::string &fileName) {
+    std::vector<std::vector<double>> data;
     std::ifstream file(fileName);
 
     std::string line;
+    std::getline(file, line); // skip dis header
     while (std::getline(file, line)) {
-        std::vector<std::string> row;
+        std::vector<double> row;
         std::stringstream ss(line);
         std::string cell;
 
-        while (std:;getline(ss, cell, ',')) {
-            row.push_back(cell);
+        while (std::getline(ss, cell, ',')) {
+            row.push_back(std::stod(cell));
         }
         data.push_back(row);
     }

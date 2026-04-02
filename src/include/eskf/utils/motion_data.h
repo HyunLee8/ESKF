@@ -7,7 +7,7 @@
 
 class MotionData {
 private:
-    std::vector<std::vector<std::double>> motionData;
+    std::vector<std::vector<double>> motionData;
     Eigen::Matrix<double, 3, 1> Pos;
     Eigen::Matrix<double, 3, 1> Vel;
 
@@ -23,9 +23,9 @@ public:
 
     void getMotionData(int i);
 
-    Eigen::Matrix<double, 3, 1> getPos;
+    Eigen::Matrix<double, 3, 1> getPos();
 
-    Eigen::Matrix<double, 3, 1> getVel;
-}
+    Eigen::Matrix<double, 3, 1> getVel();
+};
 
 #endif

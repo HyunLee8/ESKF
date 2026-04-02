@@ -21,7 +21,7 @@ private:
     static constexpr int GYRO_Z_COL = 6;
 
 public:
-    SensorData(const std::vector<std::vector<std::double>>& data);
+    SensorData(const std::vector<std::vector<double>>& data);
 
     void getSensorData(int i);
 

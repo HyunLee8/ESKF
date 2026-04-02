@@ -1,6 +1,3 @@
-#isndef RUNFILTER_H
-#define RUNFILTER_H
+#pragma once
 
 void RunFilter();
-
-#endif

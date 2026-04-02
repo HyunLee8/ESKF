@@ -1,4 +1,4 @@
-"""
+/*
 Author: Isaac Lee
 Date: Jan 10, 2026
 Description:
@@ -11,12 +11,12 @@ Description:
     were written in Eigen::Matrix from the start 
     because I thought I had to reshape it later.
     Time step will be returned as a double.
-"""
+*/
 
 #include "eskf/utils/sensor_data.h"
 
 SensorData::SensorData(const std::vector<std::vector<double>>& data)
-    : sensorData(data){}
+    : sensorData(data), dt(0), Acc(0, 0, 0), Gyro( 0, 0, 0){}
 
 void SensorData::getSensorData(int i) {
     dt = sensorData[i+1][DT_COL] - sensorData[i][DT_COL];
@@ -39,5 +39,5 @@ Eigen::Matrix<double, 3, 1> SensorData::getAcc() {
 }
 
 Eigen::Matrix<double, 3, 1> SensorData::getGyro() {
-    return Gryo;
+    return Gyro;
 }

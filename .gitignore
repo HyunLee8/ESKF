@@ -39,6 +39,16 @@ env/
 # VS Code
 .vscode/
 
+# C++/CMake
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build/
+*.o
+*.out
+
 # macOS
 .DS_Store
 .AppleDouble

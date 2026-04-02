@@ -16,10 +16,15 @@ Index:
 
 */
 
-#include "eskf/utils/RunFilter.h"
-#include <iostream>
+#include "eskf/data/data.h"
+#include "eskf/filter/filter.h"
 
 int main() {
-    RunFilter();
+    Data data(0);
+    ESKF TrueFilter(data);
+    while(TrueFilter.iterration < 5000) {
+        TrueFilter.predict();
+        TrueFilter.update();
+    }
     return 0;
 }
