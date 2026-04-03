@@ -21,11 +21,11 @@ Index:
 
 int main() {
     Data data(0);
-    ESKF TrueFilter(data);
-    while(TrueFilter.iterration < 100) {
-        TrueFilter.predict();
-        TrueFilter.update();
-        TrueFilter.nextSet();
+    ESKF& filter = ESKF::getInstance(data);
+    while(filter.iterration < 100) {
+        filter.predict();
+        filter.update();
+        filter.nextSet();
     }
     return 0;
 }

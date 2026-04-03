@@ -10,8 +10,7 @@ add_executable(ErrorStateKalmanFilter
     src/main.cpp
     src/utils/motion_data.cpp
     src/utils/sensor_data.cpp
-    src/utils/RunFilter.cpp
-    src/filter/filter.cpp
+        src/filter/filter.cpp
     src/data/data.cpp
 )
 

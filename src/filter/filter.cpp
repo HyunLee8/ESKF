@@ -46,6 +46,12 @@
 #include <string>
 #include <iostream>
 
+//singleton class making sure only one instance
+ESKF& ESKF::getInstance(Data& data) {
+    static ESKF filter(data);
+    return filter;
+}
+
 ESKF::ESKF(Data& data) : dataObject(data) {
     sig_a_noise = 0.1;
     sig_a_walk = 0.1;
@@ -77,9 +83,6 @@ ESKF::ESKF(Data& data) : dataObject(data) {
     Gyro = dataObject.getGyro();
     Acc = dataObject.getAcc();
 
-
-
-
     Pos = dataObject.getPos();
     Vel = dataObject.getVel();
 
@@ -90,6 +93,8 @@ ESKF::ESKF(Data& data) : dataObject(data) {
 
     U << Acc, Gyro;
 }
+
+
 
 Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) {
     double vx = v(0);

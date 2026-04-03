@@ -51,7 +51,13 @@ public:
     int iterration;
 
 public:
-    ESKF(Data& data);
+    static ESKF& getInstance(Data& data);
+    //copy
+    ESKF(const ESKF&) = delete;
+    ESKF operator=(const ESKF&) = delete;
+    //move
+    ESKF(const ESKF&&) = delete;
+    ESKF operator=(const ESKF&&) = delete;
 
     Eigen::Matrix<double, 3, 3> skewSymmetric(Eigen::Matrix<double, 3, 1>& v);
 
@@ -68,6 +74,8 @@ public:
     void predict();
 
     void update();
+private:
+    ESKF(Data& data);
 };
 
 #endif
