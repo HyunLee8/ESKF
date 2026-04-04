@@ -20,33 +20,32 @@ Description:
 #include <fstream>
 #include <sstream>
 
-Data::Data(int i)
+Data::Data(const int i)
     : sensorData(readCSV("../src/data/sensor_data.csv")),
-      motionData(readCSV("../src/data/motion_data.csv")) {
+      motionData(readCSV("../src/data/motion_data.csv")),
+      itr(i) {
 
-    itr = i;
-
-    sensorData.getSensorData(itr);
-    motionData.getMotionData(itr);
+    sensorData.loadSensorData(itr);
+    motionData.loadMotionData(itr);
 }
 
 double Data::getdt() {
     return sensorData.getdt();
 }
 
-Eigen::Matrix<double, 3, 1> Data::getAcc() {
+Eigen::Vector3d Data::getAcc() {
     return sensorData.getAcc();
 }
 
-Eigen::Matrix<double, 3, 1> Data::getGyro() {
+Eigen::Vector3d Data::getGyro() {
     return sensorData.getGyro();
 }
 
-Eigen::Matrix<double, 3, 1> Data::getPos() {
+Eigen::Vector3d Data::getPos() {
     return motionData.getPos();
 }
 
-Eigen::Matrix<double, 3, 1> Data::getVel() {
+Eigen::Vector3d Data::getVel() {
     return motionData.getVel();
 }
 

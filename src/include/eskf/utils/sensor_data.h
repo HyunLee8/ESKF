@@ -21,15 +21,15 @@ private:
     static constexpr int GYRO_Z_COL = 3;
 
 public:
-    SensorData(const std::vector<std::vector<double>>& data);
+    explicit SensorData(const std::vector<std::vector<double>>& data);
 
-    void getSensorData(int i);
+    void loadSensorData(size_t i);
 
     double getdt();
 
-    Eigen::Matrix<double, 3, 1> getAcc();
+    Eigen::Vector3d getAcc();
 
-    Eigen::Matrix<double, 3, 1> getGyro();
+    Eigen::Vector3d getGyro();
 };
 
 #endif

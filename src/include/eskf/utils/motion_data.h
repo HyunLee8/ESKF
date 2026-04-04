@@ -19,13 +19,13 @@ private:
     static constexpr int VEL_Z_COL = 5;
 
 public:
-    MotionData(const std::vector<std::vector<double>>& data);
+    explicit MotionData(const std::vector<std::vector<double>>& data);
 
-    void getMotionData(int i);
+    void loadMotionData(size_t i);
 
-    Eigen::Matrix<double, 3, 1> getPos();
+    Eigen::Vector3d getPos();
 
-    Eigen::Matrix<double, 3, 1> getVel();
+    Eigen::Vector3d getVel();
 };
 
 #endif

@@ -11,17 +11,18 @@ private:
     std::vector<std::vector<double>> motion_data_csv;
     std::vector<std::vector<double>> readCSV(const std::string &fileName);
 
-
-public:
     SensorData sensorData;
     MotionData motionData;
 
-    int itr;
-
+public:
+    size_t itr;
     explicit Data(int i);
     double getdt();
-    Eigen::Matrix<double, 3, 1> getAcc();
-    Eigen::Matrix<double, 3, 1> getGyro();
-    Eigen::Matrix<double, 3, 1> getPos();
-    Eigen::Matrix<double, 3, 1> getVel();
+    Eigen::Vector3d getAcc();
+    Eigen::Vector3d getGyro();
+    Eigen::Vector3d getPos();
+    Eigen::Vector3d getVel();
+
+    SensorData& getSensorInstance() { return sensorData; }
+    MotionData& getMotionInstance() { return motionData; }
 };

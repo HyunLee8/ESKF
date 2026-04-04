@@ -18,7 +18,7 @@ Description:
 SensorData::SensorData(const std::vector<std::vector<double>>& data)
     : sensorData(data), dt(0), Acc(0, 0, 0), Gyro( 0, 0, 0){}
 
-void SensorData::getSensorData(int i) {
+void SensorData::loadSensorData(const size_t i) {
     if (i < sensorData.size() - 1) {
         dt = sensorData[i+1][DT_COL] - sensorData[i][DT_COL];
     } else {
@@ -38,10 +38,10 @@ double SensorData::getdt() {
     return dt;
 }
 
-Eigen::Matrix<double, 3, 1> SensorData::getAcc() {
+Eigen::Vector3d SensorData::getAcc() {
     return Acc;
 }
 
-Eigen::Matrix<double, 3, 1> SensorData::getGyro() {
+Eigen::Vector3d SensorData::getGyro() {
     return Gyro;
 }

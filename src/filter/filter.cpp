@@ -344,10 +344,8 @@ void ESKF::update() {
 
 //this is a lazy ass fix
 void ESKF::nextSet() {
-    dataObject.itr++;
-
-    dataObject.sensorData.getSensorData(dataObject.itr);
-    dataObject.motionData.getMotionData(dataObject.itr);
+    dataObject.getSensorInstance().loadSensorData(dataObject.itr); //loads Gyro Acc and Dt in sensorData obj
+    dataObject.getMotionInstance().loadMotionData(dataObject.itr); // loads pos and vel into motionDataObj
 
     dt = dataObject.getdt();
     Gyro = dataObject.getGyro();
@@ -357,12 +355,17 @@ void ESKF::nextSet() {
 
     Measurement << Pos, Vel;
     U << Acc, Gyro;
+
+    dataObject.itr++;
+
+    //don't need interration++ because active
+    //move already increments in the filter
 }
 
 void ESKF::testFrame(TESTING_TYPE TEST) {
     if (TEST == TESTING_TYPE::BOUNDS) {
-        dataObject.sensorData.getSensorData(dataObject.itr);
-        dataObject.motionData.getMotionData(dataObject.itr);
+        dataObject.getSensorInstance().loadSensorData(dataObject.itr);
+        dataObject.getMotionInstance().loadMotionData(dataObject.itr);
 
         dt = dataObject.getdt();
         Gyro = dataObject.getGyro();
@@ -379,5 +382,6 @@ void ESKF::testFrame(TESTING_TYPE TEST) {
 
         dataObject.itr++;
         iterration++;
+        //testing doesn't increment
     }
 }

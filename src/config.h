@@ -5,7 +5,7 @@ enum class TESTING_TYPE { ALL_VALUES, BOUNDS, NAME_CONFLICTIONS };
 
 //VALUES TO CHANGE
 //========================================================
-constexpr Mode CURRENT_MODE = Mode::TESTING;
+constexpr Mode CURRENT_MODE = Mode::ACTIVE;
 constexpr TESTING_TYPE CURRENT_TEST = TESTING_TYPE::BOUNDS;
 //=========================================================
 

@@ -12,7 +12,7 @@ Description:
 MotionData::MotionData(const std::vector<std::vector<double>>& data)
     : motionData(data) {}
 
-void MotionData::getMotionData(int i) {
+void MotionData::loadMotionData(const size_t i) {
     Pos << motionData[i][POS_X_COL],
            motionData[i][POS_Y_COL],
            motionData[i][POS_Z_COL];
@@ -22,10 +22,10 @@ void MotionData::getMotionData(int i) {
            motionData[i][VEL_Z_COL];
 }
 
-Eigen::Matrix<double, 3, 1> MotionData::getPos() {
+Eigen::Vector3d MotionData::getPos() {
     return Pos;
 }
 
-Eigen::Matrix<double, 3, 1> MotionData::getVel() {
+Eigen::Vector3d MotionData::getVel() {
     return Vel;
 }
