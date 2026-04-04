@@ -1,23 +1,23 @@
-# Sola's Error-State Kalman Filter
+# Error State Kalman Filter
 
-Everything here has been updated from the previous garbage code that I had for several months and never updated. Bulk of this ReadMe will be a brief summary of setting up the program and a little conceptual understanding of the ESKF. For following me on the thought process of the program archietecture and a deeper conceptual undestanding of the ESKF, it will be at the top and all around of each .cpp file in /Final_Implementation. Currently the .cpp files are being refurbished but if you wanna see the fully functional python implementation you can check /Draft_Implementation. Enjoy the work done so far.
-
-## Data
-
+Finished Implementation in C++ and Python -> /Test_Notes. Still making changes for optimization and class for real sensor instead of interating through csv file. This implementation has 0 heap allocation (No New Keyword) as STM 32 does not allow an dynamically allocated sizes thus all types instead of Eigen::VectorXd or Eigen::MatrixXd, all type will have set template arguments and vectors will always be put into Eigen::Vector3d. 
 <table>
   <tr>
     <td width="50%"><img src="https://github.com/HyunLee8/ErrorStateKalmanFilter/blob/c3cf1b0c57cff196f236105c246aefd366c0b9c2/results/orientation_animation.gif?raw=true" width="100%" /></td>
-    <td width="50%"><img src="https://github.com/HyunLee8/Error-State-Kalman-Filter/blob/main/results/Screenshot%202026-01-02%20at%202.55.49%E2%80%AFPM.png?raw=true" width="100%" /></td>
   </tr>
-  <tr>
+<tr>
     <td width="50%"><img src="https://github.com/HyunLee8/Error-State-Kalman-Filter/blob/main/results/Screenshot%202026-01-02%20at%202.56.02%E2%80%AFPM.png?raw=true" width="100%" /></td>
-    <td width="50%"><img src="https://github.com/HyunLee8/Error-State-Kalman-Filter/blob/main/results/Screenshot%202026-01-02%20at%202.56.18%E2%80%AFPM.png?raw=true" width="100%" /></td>
   </tr>
 </table>
 
 ## Overview
 
 This ESKF implementation uses quaternion representation for orientation estimation, avoiding gimbal lock issues associated with Euler angles. The filter predicts state using gyroscope and accelerometer data, then corrects the estimates using GPS data. Intuitive explanation is in filter.py comments.
+
+**One important caveat for gravity is that typically in most papers you will see that
+gravity is included in the error states however when computing it almost never affects
+the kalman gain or any other values when applied. Also it only adds unecessary complexity
+thus is not inluded in delta X.
 
 **State Vector (16 elements):**
 - Position (3D): `[x, y, z]`
@@ -35,8 +35,7 @@ This ESKF implementation uses quaternion representation for orientation estimati
 
 ## Theoretical Background
 
-This project could not have been done without these resources (The first link is absolutely goated on general KF). The second link is for implementation. Also check out chapter 6 for implementing update step. ThreeBlueOneBrown does an absolutely amazing explanation on quaternions 
-visualzed and somehow gives us 3d people a somewhat grasp of a 4d concept.
+This project could not have been done without these resources (The first link is really good on probabalistic intuition). The second link is for implementation. Also check out chapter 6 for implementing update step.
 
 1. **Basic Kalman Filter Intuition**: [How a Kalman Filter Works (in Pictures)](https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/)
 2. **ESKF with Quaternions** (Sections 5.1-5.4.3): [Quaternion kinematics for the error-state Kalman filter](https://arxiv.org/pdf/1711.02508)
@@ -68,36 +67,3 @@ pip install numpy pandas pyquaternion
 cd src
 python main.py
 ```
-**Parameter Guidelines:**
-- **`sig_a_noise`**: Set based on your accelerometer datasheet noise density
-- **`sig_w_noise`**: Set based on your gyroscope datasheet noise density
-- **`sig_a_walk`**: Accelerometer bias instability (how fast bias drifts)
-- **`sig_w_walk`**: Gyroscope bias instability (how fast bias drifts)
-- **`gravity`**: Local gravitational acceleration (typically 9.81 m/s²)
-
-**One important caveat for gravity is that typically in most papers you will see that
-  gravity is included in the error states however when computing it almost never affects 
-  the kalman gain or any other values when applied. Also it only adds unecessary complexity
-  thus is not inluded in delta X.
-
-## Algorithm Details
-
-### Prediction Step ~~ explained better in src/filter/filter.py
-
-1. **Remove biases** from IMU measurements
-2. **Transform acceleration** to global frame using current orientation
-3. **Integrate** position and velocity using kinematic equations
-4. **Update orientation** via quaternion multiplication
-5. **Propagate covariance** using linearized error-state dynamics
-
-### Update Step ~~ explained better in src/filter/filter.py
-
-1. **Compute innovation** (measurement - prediction)
-2. **Calculate Kalman gain** using current covariance and measurement noise
-3. **Update error state** with innovation
-4. **Inject error state** into nominal state:
-   - Position: direct addition
-   - Orientation: quaternion multiplication
-   - Velocity and biases: direct addition
-5. **Update covariance** using Joseph form (numerically stable)
-6. **Reset error state** to zero
