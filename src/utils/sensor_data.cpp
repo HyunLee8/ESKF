@@ -19,7 +19,11 @@ SensorData::SensorData(const std::vector<std::vector<double>>& data)
     : sensorData(data), dt(0), Acc(0, 0, 0), Gyro( 0, 0, 0){}
 
 void SensorData::getSensorData(int i) {
-    dt = sensorData[i+1][DT_COL] - sensorData[i][DT_COL];
+    if (i < sensorData.size() - 1) {
+        dt = sensorData[i+1][DT_COL] - sensorData[i][DT_COL];
+    } else {
+        dt = 0;
+    }
 
     Acc << sensorData[i][ACC_X_COL],
            sensorData[i][ACC_Y_COL],

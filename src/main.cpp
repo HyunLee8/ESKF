@@ -18,14 +18,21 @@ Index:
 
 #include "eskf/data/data.h"
 #include "eskf/filter/filter.h"
+#include "config.h"
 
 int main() {
     Data data(0);
     ESKF& filter = ESKF::getInstance(data);
+
     while(filter.iterration < 100) {
-        filter.predict();
-        filter.update();
-        filter.nextSet();
+        if (isTesting()) {
+            filter.testFrame(CURRENT_TEST);
+        } else {
+            filter.predict();
+            filter.update();
+            filter.nextSet();
+        }
     }
+
     return 0;
 }

@@ -39,11 +39,10 @@
 */
 
 #include "eskf/filter/filter.h"
+#include "config.h"
 #include <eskf/data/data.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
-#include <vector>
-#include <string>
 #include <iostream>
 
 //singleton class making sure only one instance
@@ -93,8 +92,6 @@ ESKF::ESKF(Data& data) : dataObject(data) {
 
     U << Acc, Gyro;
 }
-
-
 
 Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) {
     double vx = v(0);
@@ -288,7 +285,6 @@ void ESKF::update() {
                  v;
     y = Measurement - predicted; //FIX THIS LATER.
 
-
     Eigen::Matrix<double, 6, 6> S = H * P * H.transpose() + RMeasurement;
     Eigen::Matrix<double, 15, 6> K = P * H.transpose() * S.ldlt().solve(Eigen::Matrix<double, 6, 6>::Identity());
 
@@ -361,4 +357,27 @@ void ESKF::nextSet() {
 
     Measurement << Pos, Vel;
     U << Acc, Gyro;
+}
+
+void ESKF::testFrame(TESTING_TYPE TEST) {
+    if (TEST == TESTING_TYPE::BOUNDS) {
+        dataObject.sensorData.getSensorData(dataObject.itr);
+        dataObject.motionData.getMotionData(dataObject.itr);
+
+        dt = dataObject.getdt();
+        Gyro = dataObject.getGyro();
+        Acc = dataObject.getAcc();
+        Pos = dataObject.getPos();
+        Vel = dataObject.getVel();
+
+        std::cout << "ITERATION: " << dataObject.itr + 1 << '\n';
+        std::cout << "Gyro: " << Gyro(0) << " " << Gyro(1) << " " << Gyro(2) << " " << '\n';
+        std::cout << "Acc : " << Acc(0) << " " << Acc(1) << " " << Acc(2) << " " << '\n';
+        std::cout << "Pos: " << Pos(0) << " " << Pos(1) << " " << Pos(2) << " " << '\n';
+        std::cout << "Vel: " << Vel(0) << " " << Vel(1) << " " << Vel(2) << " " << '\n';
+        std::cout << '\n';
+
+        dataObject.itr++;
+        iterration++;
+    }
 }

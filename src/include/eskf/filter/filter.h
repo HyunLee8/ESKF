@@ -9,10 +9,10 @@
 #define FILTER_HPP
 
 #include "eskf/data/data.h"
-#include <vector>
-#include <string>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+
+enum class TESTING_TYPE;
 
 class ESKF {
 private:
@@ -74,8 +74,10 @@ public:
     void predict();
 
     void update();
+
+    void testFrame(TESTING_TYPE);
 private:
-    ESKF(Data& data);
+    explicit ESKF(Data& data);
 };
 
 #endif

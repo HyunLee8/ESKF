@@ -13,7 +13,6 @@ private:
 
 
 public:
-
     SensorData sensorData;
     MotionData motionData;
 
