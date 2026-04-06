@@ -14,6 +14,7 @@ add_executable(ErrorStateKalmanFilter
     src/data/data.cpp
         src/config.h
         src/include/eskf/utils/dimensions.h
+        src/include/eskf/utils/Timer.h
 )
 
 target_link_libraries(ErrorStateKalmanFilter Eigen3::Eigen)

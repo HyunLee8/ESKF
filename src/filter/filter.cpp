@@ -366,11 +366,11 @@ void ESKF::testFrame(TESTING_TYPE TEST) {
         Pos = dataObject.getPos();
         Vel = dataObject.getVel();
 
-        std::cout << "ITERATION: " << dataObject.itr + 1 << '\n';
-        std::cout << "Gyro: " << Gyro(0) << " " << Gyro(1) << " " << Gyro(2) << " " << '\n';
-        std::cout << "Acc : " << Acc(0) << " " << Acc(1) << " " << Acc(2) << " " << '\n';
-        std::cout << "Pos: " << Pos(0) << " " << Pos(1) << " " << Pos(2) << " " << '\n';
-        std::cout << "Vel: " << Vel(0) << " " << Vel(1) << " " << Vel(2) << " " << '\n';
+        std::cout << "Index: " << dataObject.itr + 1 << '\n';
+        std::cout << "Gyro: [" << Gyro(0) << " " << Gyro(1) << " " << Gyro(2) << "]^T " << '\n';
+        std::cout << "Acc : [" << Acc(0) << " " << Acc(1) << " " << Acc(2) << "]^T " << '\n';
+        std::cout << "Pos: [" << Pos(0) << " " << Pos(1) << " " << Pos(2) << "]^T " << '\n';
+        std::cout << "Vel: [" << Vel(0) << " " << Vel(1) << " " << Vel(2) << "]^T " << '\n';
         std::cout << '\n';
 
         dataObject.itr++;
