@@ -51,7 +51,7 @@ ESKF& ESKF::getInstance(Data& data) {
     return filter;
 }
 
-ESKF::ESKF(Data& data) : dataObject(data) {
+ESKF::ESKF(const Data& data) : dataObject(data) {
     iteration = 0;
 
     X.setZero();                            //initialize States
@@ -62,7 +62,7 @@ ESKF::ESKF(Data& data) : dataObject(data) {
     P = Eigen::Matrix<double, 15, 15>::Identity();
 
 
-    Eigen::Matrix<double, 12, 1> diagVec;
+    Eigen::Matrix<double, Dim::NOISE_DIM, 1> diagVec;
     diagVec << sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise, sig_a_noise*sig_a_noise,
          sig_w_noise*sig_w_noise, sig_w_noise*sig_w_noise, sig_w_noise*sig_w_noise,
          sig_a_walk*sig_a_walk, sig_a_walk*sig_a_walk, sig_a_walk*sig_a_walk,
@@ -79,17 +79,17 @@ ESKF::ESKF(Data& data) : dataObject(data) {
     Vel = dataObject.getVel();
 
     Measurement << Pos, Vel;
-    RMeasurement = Eigen::Matrix<double, 6, 6>::Identity();
+    RMeasurement = Eigen::Matrix<double, Dim::MEASUREMENT_DIM, Dim::MEASUREMENT_DIM>::Identity();
 
     measuredSize = 6;
 
     U << Acc, Gyro;
 }
 
-Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) {
-    double vx = v(0);
-    double vy = v(1);
-    double vz = v(2);
+Eigen::Matrix<double, Dim::VECTOR_3D_DIM, Dim::VECTOR_3D_DIM> ESKF::skewSymmetric(Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1>& v) {
+    const double vx = v(0);
+    const double vy = v(1);
+    const double vz = v(2);
 
     Eigen::Matrix<double, 3, 3> mat;
     mat <<  0,   -vz,   vy,
@@ -99,13 +99,13 @@ Eigen::Matrix<double, 3, 3> ESKF::skewSymmetric(Eigen::Matrix<double, 3, 1>& v) 
     return mat;
 }
 
-Eigen::Matrix<double, 4, 3> ESKF::quaternionSkewSymmetric(Eigen::Matrix<double, 4, 1>& v) {
+Eigen::Matrix<double, 4, 3> ESKF::quaternionSkewSymmetric(Eigen::Matrix<double, Dim::QUATERNION_DIM, 1>& v) {
     double qw = v(0);
     double qx = v(1);
     double qy = v(2);
     double qz = v(3);
 
-    Eigen::Matrix<double, 4, 3> mat;
+    Eigen::Matrix<double, Dim::QUATERNION_DIM, 3> mat;
     mat << -qx,  -qy,  -qz,
             qw,  -qz,   qy,
             qz,   qw,  -qx,
@@ -114,7 +114,7 @@ Eigen::Matrix<double, 4, 3> ESKF::quaternionSkewSymmetric(Eigen::Matrix<double, 
 }
 
 Eigen::Quaterniond ESKF::quaternionRotation(Eigen::Vector3d& three_dim_theta) {
-    Eigen::Vector3d theta = three_dim_theta.tail<3>();
+    const Eigen::Vector3d theta = three_dim_theta.tail<3>();
     double angle = theta.norm();
     if(angle > 0) {
         Eigen::Vector3d axis = theta / angle;
@@ -126,8 +126,8 @@ Eigen::Quaterniond ESKF::quaternionRotation(Eigen::Vector3d& three_dim_theta) {
     }
 }
 
-Eigen::Matrix<double, 15, 15> ESKF::computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R) {
-    Eigen::Matrix<double, 15, 15> Fx = Eigen::Matrix<double, 15, 15>::Identity();
+Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> ESKF::computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R) {
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> Fx = Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM>::Identity();
     Fx.block<3, 3>(0, 6) = Eigen::Matrix3d::Identity() * dt;
     Fx.block<3, 3>(3, 3) = Eigen::Matrix3d::Identity() - skewSymmetric(w) * dt;
     Fx.block<3, 3>(3, 12) = -Eigen::Matrix3d::Identity() * dt;
@@ -137,8 +137,8 @@ Eigen::Matrix<double, 15, 15> ESKF::computeErrorStateJacobian(double& dt, Eigen:
     return Fx;
 }
 
-Eigen::Matrix<double, 15, 12> ESKF::computeNoiseJacobian(double dt, const Eigen::Matrix3d& R) {
-    Eigen::Matrix<double, 15, 12> Fi;
+Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> ESKF::computeNoiseJacobian(double dt, const Eigen::Matrix3d& R) {
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> Fi;
     Fi.setZero();
     Fi.block<3, 3>(6, 0) = -R * dt;
     Fi.block<3, 3>(3, 3) = -Eigen::Matrix3d::Identity() * dt;
@@ -273,17 +273,17 @@ void ESKF::update() {
     H = Eigen::MatrixXd::Zero(6, 15);
     H.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();
     H.block<3, 3>(3, 6) = Eigen::Matrix3d::Identity();
-    Eigen::Matrix<double, 6, 1> predicted; // IMPORNTANT: same issue as line 235
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, 1> predicted; // IMPORNTANT: same issue as line 235
     predicted << p,
                  v;
     y = Measurement - predicted; //FIX THIS LATER.
 
-    Eigen::Matrix<double, 6, 6> S = H * P * H.transpose() + RMeasurement;
-    Eigen::Matrix<double, 15, 6> K = P * H.transpose() * S.ldlt().solve(Eigen::Matrix<double, 6, 6>::Identity());
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, Dim::MEASUREMENT_DIM> S = H * P * H.transpose() + RMeasurement;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::MEASUREMENT_DIM> K = P * H.transpose() * S.ldlt().solve(Eigen::Matrix<double, Dim::MEASUREMENT_DIM, Dim::MEASUREMENT_DIM>::Identity());
 
     delta_X = (K * y);
 
-    Eigen::Matrix<double, 15, 15> I_KH = Eigen::Matrix<double, 15, 15>::Identity() - K * H;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> I_KH = Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM>::Identity() - K * H;
     P = I_KH * P * I_KH.transpose() + K * RMeasurement * K.transpose();
 
     Eigen::Vector3d delta_p(delta_X[0], delta_X[1], delta_X[2]);
@@ -325,11 +325,10 @@ void ESKF::update() {
     X[15] += delta_wb[2];
     delta_X.setZero();
 
-    std::cout << iteration << "   ";
-    std::cout << "q1: " << X[3];
-    std::cout << " | q2: " << X[4];
-    std::cout << " | q3: " << X[5];
-    std::cout << " | q4: " << X[6];
+    std::cout << "Index: " << iteration << std::endl;
+    std::cout << "qw: " << X[3] << " | qx: " << X[4] << " | qy: " << X[5] << " | qz: " << X[6] << std::endl;
+    std::cout << "px: " << X[0] << " | py: " << X[1] << " | pz: " << X[2] << std::endl;
+    std::cout << "vx: " << X[7] << " | vy: " << X[8] << " | vz: " << X[9] << std::endl;
     std::cout << '\n';
 
     // Make csv loading logic here soon
@@ -352,7 +351,7 @@ void ESKF::nextSet() {
 
     dataObject.itr++;
 
-    //don't need interration++ because active
+    //don't need interation++ because active
     //move already increments in the filter
 }
 

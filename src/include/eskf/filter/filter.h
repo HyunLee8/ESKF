@@ -60,15 +60,15 @@ public:
     ESKF(const ESKF&&) = delete;
     ESKF operator=(const ESKF&&) = delete;
 
-    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, Dim::VECTOR_3D_DIM> skewSymmetric(Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1>& v);
+    static Eigen::Matrix<double, Dim::VECTOR_3D_DIM, Dim::VECTOR_3D_DIM> skewSymmetric(Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1>& v);
 
-    Eigen::Matrix<double, Dim::QUATERNION_DIM, Dim::VECTOR_3D_DIM> quaternionSkewSymmetric(Eigen::Matrix<double, Dim::QUATERNION_DIM, 1>& v);
+    static Eigen::Matrix<double, Dim::QUATERNION_DIM, Dim::VECTOR_3D_DIM> quaternionSkewSymmetric(Eigen::Matrix<double, Dim::QUATERNION_DIM, 1>& v);
 
-    Eigen::Quaterniond quaternionRotation(Eigen::Vector3d& three_dim_theta);
+    static Eigen::Quaterniond quaternionRotation(Eigen::Vector3d& three_dim_theta);
 
-    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> computeNoiseJacobian(double dt, const Eigen::Matrix3d& R);
+    static Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> computeNoiseJacobian(double dt, const Eigen::Matrix3d& R);
 
-    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R);
+    static Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R);
 
     void nextSet();
 
@@ -78,7 +78,7 @@ public:
 
     void testFrame(TESTING_TYPE);
 private:
-    explicit ESKF(Data& data);
+    explicit ESKF(const Data& data);
 };
 
 #endif
