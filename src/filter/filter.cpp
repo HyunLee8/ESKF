@@ -304,7 +304,8 @@ void ESKF::update() {
         delta_q = Eigen::Quaterniond(Eigen::AngleAxisd(angle, axis));
     }
 
-    Eigen::Quaterniond updatedQ = (delta_q * nominalQ).normalized();
+    //left convention fix
+    Eigen::Quaterniond updatedQ = (nominalQ * delta_q).normalized();
 
     X[0] += delta_p[0];
     X[1] += delta_p[1];
