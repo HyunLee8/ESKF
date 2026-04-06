@@ -31,7 +31,7 @@ void SensorData::loadSensorData(const size_t i) {
 
     Gyro << sensorData[i][GYRO_X_COL],
             sensorData[i][GYRO_Y_COL],
-            sensorData[i][GYRO_Z_COL]; 
+            sensorData[i][GYRO_Z_COL];
 }
 
 double SensorData::getdt() {

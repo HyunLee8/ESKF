@@ -52,11 +52,6 @@ ESKF& ESKF::getInstance(Data& data) {
 }
 
 ESKF::ESKF(Data& data) : dataObject(data) {
-    sig_a_noise = 0.1;
-    sig_a_walk = 0.1;
-    sig_w_noise = 0.1;
-    sig_w_walk = 0.1;
-
     gravity = 9.81;
     iterration = 0;
     dataObject = data;

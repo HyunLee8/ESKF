@@ -1,6 +1,6 @@
 # Error State Kalman Filter
 
-Finished Implementation in C++ and Python -> /Test_Notes. Still making changes for optimization and class for real sensor instead of interating through csv file. This implementation has 0 heap allocation (No New Keyword) as STM 32 does not allow an dynamically allocated sizes thus all types instead of Eigen::VectorXd or Eigen::MatrixXd, all type will have set template arguments and vectors will always be put into Eigen::Vector3d. 
+Finished Implementation in C++ and Python -> /Test_Notes. Still making changes for optimization and class for real sensor instead of interating through csv file. This implementation has 0 heap allocation (No New Keyword) as STM 32 does not allow an dynamically allocated sizes thus all types instead of Eigen::VectorXd or Eigen::MatrixXd, all type will have set template arguments and vectors will always be put into Eigen::Vector3d or Eigen::Matrix<double, dim, 1>. 
 <table>
   <tr>
     <td width="50%"><img src="https://github.com/HyunLee8/ErrorStateKalmanFilter/blob/c3cf1b0c57cff196f236105c246aefd366c0b9c2/results/orientation_animation.gif?raw=true" width="100%" /></td>

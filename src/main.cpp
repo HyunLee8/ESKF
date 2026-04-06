@@ -20,11 +20,14 @@ Index:
 #include "eskf/filter/filter.h"
 #include "config.h"
 
+constexpr int rows = 100;
+constexpr int starting_index = 0;
+
 int main() {
-    Data data(0);
+    Data data(starting_index);
     ESKF& filter = ESKF::getInstance(data);
 
-    while(filter.iterration < 100) {
+    while(filter.iterration < rows) {
         if (isTesting()) {
             filter.testFrame(CURRENT_TEST);
         } else {

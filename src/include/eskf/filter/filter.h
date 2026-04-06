@@ -14,12 +14,13 @@
 
 enum class TESTING_TYPE;
 
+
 class ESKF {
 private:
-    double sig_a_noise;
-    double sig_a_walk;
-    double sig_w_noise;
-    double sig_w_walk;
+    static constexpr double sig_a_noise = 0.01;
+    static constexpr double sig_a_walk = 0.01;
+    static constexpr double sig_w_noise = 0.01;
+    static constexpr double sig_w_walk = 0.01;
 
     Data dataObject;
     double gravity;
