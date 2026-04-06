@@ -52,9 +52,7 @@ ESKF& ESKF::getInstance(Data& data) {
 }
 
 ESKF::ESKF(Data& data) : dataObject(data) {
-    gravity = 9.81;
-    iterration = 0;
-    dataObject = data;
+    iteration = 0;
 
     X.setZero();                            //initialize States
     X(3) = 1;                               //Scalar value is set to 1
@@ -225,7 +223,7 @@ void ESKF::predict() {
     P = Fx * P * Fx.transpose() + Fi * Qi * Fi.transpose();
 
     delta_q = Eigen::Quaterniond::Identity();
-    iterration++;
+    iteration++;
 }
 
 void ESKF::update() {
@@ -326,7 +324,7 @@ void ESKF::update() {
     X[15] += delta_wb[2];
     delta_X.setZero();
 
-    std::cout << iterration << "   ";
+    std::cout << iteration << "   ";
     std::cout << "q1: " << X[3];
     std::cout << " | q2: " << X[4];
     std::cout << " | q3: " << X[5];
@@ -376,7 +374,7 @@ void ESKF::testFrame(TESTING_TYPE TEST) {
         std::cout << '\n';
 
         dataObject.itr++;
-        iterration++;
+        iteration++;
         //testing doesn't increment
     }
 }

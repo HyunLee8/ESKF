@@ -13,6 +13,7 @@ add_executable(ErrorStateKalmanFilter
         src/filter/filter.cpp
     src/data/data.cpp
         src/config.h
+        src/include/eskf/utils/dimensions.h
 )
 
 target_link_libraries(ErrorStateKalmanFilter Eigen3::Eigen)

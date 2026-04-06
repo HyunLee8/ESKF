@@ -11,9 +11,9 @@
 #include "eskf/data/data.h"
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include "eskf/utils/dimensions.h"
 
 enum class TESTING_TYPE;
-
 
 class ESKF {
 private:
@@ -23,33 +23,33 @@ private:
     static constexpr double sig_w_walk = 0.01;
 
     Data dataObject;
-    double gravity;
+    static constexpr double gravity = 9.81;
 
-    Eigen::Matrix<double, 16, 1> X;
-    Eigen::Matrix<double, 15, 1> delta_X;
-    Eigen::Matrix<double, 15, 15> P;
-    Eigen::Matrix<double, 12, 12> Qi;
-    Eigen::Matrix<double, 3, 1> Gravity;
+    Eigen::Matrix<double, Dim::NOMINAL_STATE_DIM, 1> X;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, 1> delta_X;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> P;
+    Eigen::Matrix<double, Dim::NOISE_DIM, Dim::NOISE_DIM> Qi;
+    Eigen::Matrix<double, Dim::GRAVITY_DIM, 1> Gravity;
 
-    Eigen::Matrix<double, 3, 1> Gyro;
-    Eigen::Matrix<double, 3, 1> Acc;
-    Eigen::Matrix<double, 3, 1> Pos;
-    Eigen::Matrix<double, 3, 1> Vel;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Gyro;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Acc;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Pos;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Vel;
     double dt;
 
-    Eigen::Matrix<double, 15, 15> Fx;
-    Eigen::Matrix<double, 15, 12> Fi;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> Fx;
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> Fi;
 
-    Eigen::Matrix<double, 6, 1> Measurement;
-    Eigen::Matrix<double, 6, 6> RMeasurement;
-    Eigen::Matrix<double, 6, 1> U;
-    Eigen::Matrix<double, 3, 3> R;
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, 1> Measurement;
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, 6> RMeasurement;
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, 1> U;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, Dim::VECTOR_3D_DIM> R;
 
     int measuredSize;
 
-    Eigen::Matrix<double, 6, 1> y;
+    Eigen::Matrix<double, Dim::MEASUREMENT_DIM, 1> y;
 public:
-    int iterration;
+    int iteration;
 
 public:
     static ESKF& getInstance(Data& data);
@@ -60,15 +60,15 @@ public:
     ESKF(const ESKF&&) = delete;
     ESKF operator=(const ESKF&&) = delete;
 
-    Eigen::Matrix<double, 3, 3> skewSymmetric(Eigen::Matrix<double, 3, 1>& v);
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, Dim::VECTOR_3D_DIM> skewSymmetric(Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1>& v);
 
-    Eigen::Matrix<double, 4, 3> quaternionSkewSymmetric(Eigen::Matrix<double, 4, 1>& v);
+    Eigen::Matrix<double, Dim::QUATERNION_DIM, Dim::VECTOR_3D_DIM> quaternionSkewSymmetric(Eigen::Matrix<double, Dim::QUATERNION_DIM, 1>& v);
 
     Eigen::Quaterniond quaternionRotation(Eigen::Vector3d& three_dim_theta);
 
-    Eigen::Matrix<double, 15, 12> computeNoiseJacobian(double dt, const Eigen::Matrix3d& R);
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::NOISE_DIM> computeNoiseJacobian(double dt, const Eigen::Matrix3d& R);
 
-    Eigen::Matrix<double, 15, 15> computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R);
+    Eigen::Matrix<double, Dim::ERROR_STATE_DIM, Dim::ERROR_STATE_DIM> computeErrorStateJacobian(double& dt, Eigen::Vector3d& a, Eigen::Vector3d& w, Eigen::Matrix3d& R);
 
     void nextSet();
 

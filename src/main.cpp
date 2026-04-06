@@ -27,7 +27,7 @@ int main() {
     Data data(starting_index);
     ESKF& filter = ESKF::getInstance(data);
 
-    while(filter.iterration < rows) {
+    while(filter.iteration < rows) {
         if (isTesting()) {
             filter.testFrame(CURRENT_TEST);
         } else {

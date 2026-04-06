@@ -3,13 +3,13 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include <utility>
+#include "eskf/utils/dimensions.h"
 
 class SensorData {
 private:
     std::vector<std::vector<double>> sensorData;
-    Eigen::Matrix<double, 3, 1> Acc;
-    Eigen::Matrix<double, 3, 1> Gyro;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Acc;
+    Eigen::Matrix<double, Dim::VECTOR_3D_DIM, 1> Gyro;
     double dt;
 
     static constexpr int DT_COL = 0;
