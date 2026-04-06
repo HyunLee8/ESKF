@@ -11,3 +11,4 @@ constexpr TESTING_TYPE CURRENT_TEST = TESTING_TYPE::BOUNDS;
 
 
 constexpr bool isTesting() { return CURRENT_MODE == Mode::TESTING; }
+constexpr TESTING_TYPE currentTest() { return CURRENT_TEST; }
