@@ -5,9 +5,7 @@ Finished Implementation in C++ and Python -> /Test_Notes. Still making changes f
   <tr>
     <td width="50%"><img src="https://github.com/HyunLee8/ErrorStateKalmanFilter/blob/c3cf1b0c57cff196f236105c246aefd366c0b9c2/results/orientation_animation.gif?raw=true" width="100%" /></td>
   </tr>
-<tr>
-    <td width="50%"><img src="https://github.com/HyunLee8/Error-State-Kalman-Filter/blob/main/results/Screenshot%202026-01-02%20at%202.56.02%E2%80%AFPM.png?raw=true" width="100%" /></td>
-  </tr>
+<tr>  </tr>
 </table>
 
 ## Overview
